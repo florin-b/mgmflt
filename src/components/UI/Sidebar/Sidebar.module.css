@@ -1,0 +1,10 @@
+.sidebar {
+  width: 240px;
+  margin-top: 20px;
+}
+
+.sidebar_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
