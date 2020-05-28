@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 const styles = {
     paper: {
-        marginTop: '10px',
+        marginTop: '15px',
         background: '#6c7ae0',
         height: '50px',
         textAlign: 'center',

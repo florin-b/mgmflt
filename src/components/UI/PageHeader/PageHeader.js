@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper';
 
 const styles = {
     paper: {
-        marginTop: '10px',
+        marginTop: '15px',
         marginLeft: '50px',
         background: '#F8F6FF',
         height: '50px',

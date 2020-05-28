@@ -27,6 +27,9 @@ import HartaHelper from '../../utils/HartaHelper';
 import PageHeader from '../UI/PageHeader/PageHeader';
 import { Redirect } from 'react-router';
 import AppLogo from '../UI/AppLogo/AppLogo';
+import UtilsFiliale from '../../utils/UtilsFiliale';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 
 
 import {
@@ -84,12 +87,15 @@ class Traseu extends Component {
             traseuOpriri: '',
             mapCenterLat: 0,
             mapCenterLon: 0,
-            loadingMap: false
+            loadingMap: false,
+            filialaSel: 'NN10',
+            filialaVisible: false
         }
 
         this.handleClick = this.handleClick.bind(this);
         this.getTraseuService = this.getTraseuService.bind(this);
         this.getMapCenter = this.getMapCenter.bind(this);
+        this.handleSelectedFiliala = this.handleSelectedFiliala.bind(this);
 
     }
 
@@ -100,15 +106,22 @@ class Traseu extends Component {
             this.setState({ stopTime: format(cDate, 'HH:mm') });
             cDate.setHours(0, 0, 0, 0);
             this.setState({ startTime: format(cDate, 'HH:mm') });
-            this.setState({ loadingList: true });
-            this.getMasiniService();
+           
+
+
+            if (UserInfo.myInstance.getTipAngajat() === "SBDEZ")
+                this.setState({ filialaVisible: true })
+            else
+                this.getMasiniService(UserInfo.getInstance().getUnitLog());
         }
     }
 
-    getMasiniService() {
+    getMasiniService(codFiliala) {
+
+        this.setState({ loadingList: true });
         axios.get('/distributie/masini', {
             params: {
-                filiala: UserInfo.getInstance().getUnitLog()
+                filiala: codFiliala
             }
         })
             .then(res => {
@@ -140,6 +153,35 @@ class Traseu extends Component {
 
     }
 
+    createFilialeItems() {
+
+        let filialeList = Object.entries(UtilsFiliale.FILIALE)
+            .map(([key, value]) => {
+                return (
+                    <MenuItem key={key} value={key}>{value}</MenuItem>
+                )
+            }, this);
+
+        return filialeList;
+
+    }
+
+    handleSelectedFiliala(event) {
+        this.setState({
+            filialaSel: event.target.value,
+            soferSel: '-1',
+            traseuData: '',
+            sumarTraseu: '',
+            traseuOpriri: '',
+            mapCenterLat: 0,
+            mapCenterLon: 0,
+            selectedIndex: -1
+        });
+
+        this.getMasiniService(event.target.value);
+
+    }
+
     createMasiniItems() {
 
         const { classes } = this.props;
@@ -152,7 +194,7 @@ class Traseu extends Component {
                         selected={this.state.selectedIndex === i}
                         onClick={(event) => this.handleClick(i)}
                     >
-                    <ListItemText primary={item.nrAuto} />
+                        <ListItemText primary={item.nrAuto} />
 
                     </ListItem>
                 )
@@ -219,10 +261,17 @@ class Traseu extends Component {
                 <Paper className={classes.paper}>
                     <TableContainer>
                         <Table size="small">
+                        {this.state.filialaVisible ? <TableRow>
+                                <TableCellNoLine >Filiala</TableCellNoLine>
+                                <TableCellNoLine> <Select value={this.state.filialaSel} onChange={this.handleSelectedFiliala}>
+                                    {this.createFilialeItems()}
+                                </Select>
+                                ></TableCellNoLine>
+                            </TableRow> : <div></div>}
                             <TableRow>
                                 <TableCellNoLine >Masina</TableCellNoLine>
                                 <TableCellNoLine>
-                                    <div style={{ maxWidth: 250, maxHeight: 180, overflow: 'auto' }}>
+                                    <div style={{ maxWidth: 250, maxHeight: 130, overflow: 'auto' }}>
                                         {this.state.loadingList ? <LoadingSpinner /> : <List>{this.createMasiniItems()}</List>}
                                     </div>
                                 </TableCellNoLine>

@@ -1,7 +1,8 @@
 {
   "name": "flotaweb",
   "version": "0.1.0",
-  "proxy": "http://localhost:8080/distserv",
+  "proxy": "http://10.1.3.72:8080/distserv",
+  "homepage": "http://10.1.3.72:8080/FlotaWeb/",
   "start_url": ".",
   "private": true,
   "dependencies": {

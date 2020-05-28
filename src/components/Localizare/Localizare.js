@@ -72,6 +72,7 @@ class Localizare extends Component {
         }
 
         this.handleMasinaSel = this.handleMasinaSel.bind(this);
+        this.handleSelectToate = this.handleSelectToate.bind(this);
         this.getMasiniMap = this.getMasiniMap.bind(this);
         this.getMapCenter = this.getMapCenter.bind(this);
         this.localMasiniSel = [];
@@ -110,9 +111,20 @@ class Localizare extends Component {
 
     handleMasiniResponse(response) {
         this.setState({ listMasini: response.data });
+
     }
 
     handleMasinaSel(event) {
+
+        let localList = this.state.listMasini;
+
+        localList.forEach(masina => {
+            if (masina.nrAuto === event.target.value)
+                masina.checked = event.target.checked
+        });
+
+        this.setState({ masiniSel: localList })
+
 
         if (event.target.checked) {
             this.localMasiniSel.push(event.target.value);
@@ -125,7 +137,28 @@ class Localizare extends Component {
 
     }
 
+    handleSelectToate(event) {
+
+        this.localMasiniSel = [];
+
+        let localList = this.state.listMasini;
+
+        localList.forEach(masina => masina.checked = event.target.checked);
+
+        localList.forEach(masina => {
+            if (masina.checked)
+                this.localMasiniSel.push(masina.nrAuto);
+            else
+                this.localMasiniSel.splice(this.localMasiniSel.indexOf(masina.nrAuto), 1);
+        });
+
+
+        this.setState({ listMasini: localList, masiniSel: this.localMasiniSel });
+
+    }
+
     getMasiniMap() {
+
         this.setState({ loadingMap: true });
         this.getLocatieService();
     }
@@ -166,6 +199,7 @@ class Localizare extends Component {
                                     id={item.nrAuto}
                                     value={item.nrAuto}
                                     onChange={this.handleMasinaSel}
+                                    checked={item.checked}
                                 />
                             }
                             label={item.nrAuto}
@@ -196,9 +230,21 @@ class Localizare extends Component {
                             <TableRow>
                                 <TableCellNoLine >Masina</TableCellNoLine>
                                 <TableCellNoLine>
-                                    <div style={{ maxWidth: 250, maxHeight: 180, overflow: 'auto' }}>
+                                    <div style={{ maxWidth: 250, maxHeight: 130, overflow: 'auto' }}>
                                         {this.state.loadingList ? <LoadingSpinner /> : <List>{this.createMasiniItems()}</List>}
                                     </div>
+                                </TableCellNoLine>
+                                <TableCellNoLine>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                id="100"
+                                                value="100"
+                                                onChange={this.handleSelectToate}
+                                            />
+                                        }
+                                        label="Toate masinile"
+                                    />
                                 </TableCellNoLine>
                             </TableRow>
                         </Table>
@@ -230,7 +276,7 @@ class Localizare extends Component {
                 <div>
                     <Container fluid >
                         <Row>
-                            <Col xs={2}><AppLogo/></Col>
+                            <Col xs={2}><AppLogo /></Col>
                             <Col xs={9}><PageHeader headerName='Localizare masini' /></Col>
                         </Row>
                         <Row>

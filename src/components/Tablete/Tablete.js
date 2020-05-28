@@ -11,9 +11,6 @@ import Grid from '@material-ui/core/Grid';
 import axios from 'axios';
 import LoadingSpinner from '../UI/LoadingSpinner/LoadingSpinner';
 
-
-
-
 import Table from '@material-ui/core/Table';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
@@ -160,7 +157,10 @@ class Tablete extends Component {
     handleSelectedSofer(event) {
 
         this.setState({
-            soferSel: event.target.value
+            soferSel: event.target.value,
+            codTableta: '',
+            textCodVisible: false,
+            operatie: ''
 
         });
         this.getInfoTableteService(event.target.value);
@@ -190,9 +190,27 @@ class Tablete extends Component {
     }
 
     saveChanges() {
-        console.log(this.state.soferSel);
 
-        this.getInfoTableteService(this.state.soferSel);
+        this.setState({
+            loadingStatus: true
+        });
+
+        axios.get('/distributie/gestiune', {
+            params: {
+                codTableta: this.state.codTableta,
+                codSofer: this.state.soferSel,
+                operatie: this.state.operatie
+            }
+        })
+            .then(res => {
+                this.setState({ loadingStatus: false });
+                this.getInfoTableteService(this.state.soferSel);
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log(error.responderEnd);
+                }
+            });
 
     }
 
@@ -227,11 +245,13 @@ class Tablete extends Component {
                 value="add"
                 control={<Radio color="primary" />}
                 label="Alocare tableta"
+                checked={this.state.operatie === 'aloca'}
             />
             <FormControlLabel
                 value="rem"
                 control={<Radio color="primary" />}
                 label="Inactivare tableta curenta"
+                checked={this.state.operatie === 'sterge'}
             />
         </RadioGroup>
 
@@ -266,12 +286,10 @@ class Tablete extends Component {
 
             <Grid item xs={12}>
                 <Button variant="contained" size="small" onClick={this.saveChanges} className={classes.button}>Opereaza</Button>
+                <br></br><br></br>
+                {this.state.loadingStatus ? <LoadingSpinner /> : <Status statusInfo={this.state.infoTablete}></Status>}
             </Grid>
-            <Grid xs={12} >
-                <Grid xs={12} >
-                    {this.state.loadingStatus ? <LoadingSpinner /> : <Status statusInfo={this.state.infoTablete}></Status>}
-                </Grid>
-            </Grid>
+           
         </Grid>
 
 

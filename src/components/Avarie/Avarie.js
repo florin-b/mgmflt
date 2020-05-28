@@ -232,7 +232,7 @@ class Avarie extends Component {
                     {this.state.livrari.length === 0 ? <div></div> : smsZone}
                 </Paper>
             </Grid>
-
+            <br></br><br></br>
         </Grid>
 
 
